@@ -11,11 +11,13 @@ import {
   ExternalLink,
   Trash2,
   Heart,
+  User,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Page } from "~/components/Page";
 import { Button } from "~/components/ui/button";
+import { UserAvatar } from "~/components/UserAvatar";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 import { SoundComments } from "~/components/SoundComments";
 import { SoundTags } from "~/components/SoundTags";
@@ -26,6 +28,7 @@ import { openInStrudel } from "~/utils/strudel";
 import { StrudelIframe } from "~/components/StrudelIframe";
 import { useDeleteSound } from "~/hooks/useSounds";
 import { useSoundHeartManagement } from "~/hooks/useSoundHearts";
+import { useAvatarUrl } from "~/hooks/useAvatarUrl";
 import {
   Dialog,
   DialogContent,
@@ -62,6 +65,9 @@ function SoundDetail() {
     toggleHeart,
     isLoading: heartLoading,
   } = useSoundHeartManagement(id);
+
+  // Get owner avatar
+  const { avatarUrl } = useAvatarUrl(sound?.user?.image);
 
   const handleCopyCode = async () => {
     if (!sound?.strudelCode) return;
@@ -164,7 +170,26 @@ function SoundDetail() {
           {/* Header */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">{sound.title}</h1>
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold">{sound.title}</h1>
+                {/* Owner Info */}
+                <Link
+                  to="/profiles/$userId"
+                  params={{ userId: sound.user.id }}
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
+                  <UserAvatar
+                    imageUrl={avatarUrl}
+                    userName={sound.user.name}
+                    className="h-8 w-8"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      by {sound.user.name}
+                    </p>
+                  </div>
+                </Link>
+              </div>
               <div className="flex items-center gap-2">
                 {/* Heart button - always visible if user is logged in */}
                 {session && (

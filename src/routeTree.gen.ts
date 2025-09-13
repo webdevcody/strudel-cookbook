@@ -16,12 +16,12 @@ import { Route as UnauthenticatedRouteImport } from './routes/unauthenticated'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MySoundsRouteImport } from './routes/my-sounds'
 import { Route as MySongsRouteImport } from './routes/my-songs'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SoundsCreateRouteImport } from './routes/sounds/create'
+import { Route as ProfilesUserIdRouteImport } from './routes/profiles/$userId'
 import { Route as SoundsIdIndexRouteImport } from './routes/sounds/$id/index'
 import { Route as SongIdIndexRouteImport } from './routes/song/$id/index'
 import { Route as SoundsIdEditRouteImport } from './routes/sounds/$id/edit'
@@ -56,11 +56,6 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MySoundsRoute = MySoundsRouteImport.update({
   id: '/my-sounds',
   path: '/my-sounds',
@@ -84,6 +79,11 @@ const IndexRoute = IndexRouteImport.update({
 const SoundsCreateRoute = SoundsCreateRouteImport.update({
   id: '/sounds/create',
   path: '/sounds/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfilesUserIdRoute = ProfilesUserIdRouteImport.update({
+  id: '/profiles/$userId',
+  path: '/profiles/$userId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SoundsIdIndexRoute = SoundsIdIndexRouteImport.update({
@@ -122,12 +122,12 @@ export interface FileRoutesByFullPath {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
-  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
+  '/profiles/$userId': typeof ProfilesUserIdRoute
   '/sounds/create': typeof SoundsCreateRoute
   '/song/$id/edit': typeof SongIdEditRoute
   '/sounds/$id/edit': typeof SoundsIdEditRoute
@@ -139,12 +139,12 @@ export interface FileRoutesByTo {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
-  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
+  '/profiles/$userId': typeof ProfilesUserIdRoute
   '/sounds/create': typeof SoundsCreateRoute
   '/song/$id/edit': typeof SongIdEditRoute
   '/sounds/$id/edit': typeof SoundsIdEditRoute
@@ -157,12 +157,12 @@ export interface FileRoutesById {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
-  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
+  '/profiles/$userId': typeof ProfilesUserIdRoute
   '/sounds/create': typeof SoundsCreateRoute
   '/song/$id/edit': typeof SongIdEditRoute
   '/sounds/$id/edit': typeof SoundsIdEditRoute
@@ -176,12 +176,12 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
-    | '/profile'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/unauthenticated'
     | '/upload'
+    | '/profiles/$userId'
     | '/sounds/create'
     | '/song/$id/edit'
     | '/sounds/$id/edit'
@@ -193,12 +193,12 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
-    | '/profile'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/unauthenticated'
     | '/upload'
+    | '/profiles/$userId'
     | '/sounds/create'
     | '/song/$id/edit'
     | '/sounds/$id/edit'
@@ -210,12 +210,12 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
-    | '/profile'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/unauthenticated'
     | '/upload'
+    | '/profiles/$userId'
     | '/sounds/create'
     | '/song/$id/edit'
     | '/sounds/$id/edit'
@@ -228,12 +228,12 @@ export interface RootRouteChildren {
   BrowseRoute: typeof BrowseRoute
   MySongsRoute: typeof MySongsRoute
   MySoundsRoute: typeof MySoundsRoute
-  ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   UnauthenticatedRoute: typeof UnauthenticatedRoute
   UploadRoute: typeof UploadRoute
+  ProfilesUserIdRoute: typeof ProfilesUserIdRoute
   SoundsCreateRoute: typeof SoundsCreateRoute
   SongIdEditRoute: typeof SongIdEditRoute
   SoundsIdEditRoute: typeof SoundsIdEditRoute
@@ -303,13 +303,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/my-sounds': {
       id: '/my-sounds'
       path: '/my-sounds'
@@ -343,6 +336,13 @@ declare module '@tanstack/react-router' {
       path: '/sounds/create'
       fullPath: '/sounds/create'
       preLoaderRoute: typeof SoundsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profiles/$userId': {
+      id: '/profiles/$userId'
+      path: '/profiles/$userId'
+      fullPath: '/profiles/$userId'
+      preLoaderRoute: typeof ProfilesUserIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sounds/$id/': {
@@ -399,12 +399,12 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseRoute: BrowseRoute,
   MySongsRoute: MySongsRoute,
   MySoundsRoute: MySoundsRoute,
-  ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   UnauthenticatedRoute: UnauthenticatedRoute,
   UploadRoute: UploadRoute,
+  ProfilesUserIdRoute: ProfilesUserIdRoute,
   SoundsCreateRoute: SoundsCreateRoute,
   SongIdEditRoute: SongIdEditRoute,
   SoundsIdEditRoute: SoundsIdEditRoute,

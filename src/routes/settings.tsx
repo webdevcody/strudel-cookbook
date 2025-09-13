@@ -1,16 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Page } from "~/components/Page";
 import { PageTitle } from "~/components/PageTitle";
-import { SubscriptionStatus } from "~/components/SubscriptionStatus";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
-import { PricingCard } from "~/components/PricingCard";
-import { SUBSCRIPTION_PLANS } from "~/lib/plans";
-import {
-  useUserPlan,
-  useCreateCheckoutSession,
-  useCreatePortalSession,
-  useCancelSubscription,
-} from "~/hooks/useSubscription";
 import { useUpdateUserProfile, useDeleteUserAccount } from "~/hooks/useProfile";
 import { uploadImageWithPresignedUrl } from "~/utils/storage/helpers";
 import { toast } from "sonner";
@@ -22,7 +13,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { UserAvatar } from "~/components/UserAvatar";
 import {
   Dialog,
   DialogContent,
@@ -82,8 +73,8 @@ function AccountDeletionSettings() {
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               Permanently delete your account and all associated data. This
-              action cannot be undone. All your songs and
-              subscription data will be permanently removed.
+              action cannot be undone. All your songs will be permanently
+              removed.
             </p>
             <Button
               variant="destructive"
@@ -118,7 +109,6 @@ function AccountDeletionSettings() {
               <ul className="text-sm text-gray-600 dark:text-gray-400 list-disc list-inside space-y-1">
                 <li>All uploaded songs and audio files</li>
                 <li>All liked songs and hearts</li>
-                <li>Your subscription and billing information</li>
                 <li>Your profile and account settings</li>
               </ul>
               <p className="text-sm font-semibold text-red-600 dark:text-red-400">
@@ -274,12 +264,12 @@ function ProfileSettings() {
               }`}
             >
               <input {...getInputProps()} disabled={isUploading} />
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={currentAvatarUrl || undefined} />
-                <AvatarFallback>
-                  {session?.user?.name?.charAt(0)?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
+              <UserAvatar
+                imageUrl={currentAvatarUrl}
+                userName={session?.user?.name}
+                className="h-20 w-20"
+                fallbackClassName="text-2xl"
+              />
               <div
                 className={`absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 ${
                   isUploading ? "opacity-100" : ""
@@ -336,113 +326,12 @@ function ProfileSettings() {
 }
 
 function SettingsPage() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Fetch user's current plan and subscription info
-  const { data: userPlan, isLoading: planLoading } = useUserPlan();
-
-  // Subscription mutation hooks
-  const checkoutMutation = useCreateCheckoutSession();
-  const portalMutation = useCreatePortalSession();
-  const cancelMutation = useCancelSubscription();
-
-  const handleUpgrade = (priceId: string) => {
-    setIsLoading(true);
-    checkoutMutation.mutate(
-      { data: { priceId } },
-      {
-        onSettled: () => setIsLoading(false),
-      }
-    );
-  };
-
-  const handleManageBilling = () => {
-    setIsLoading(true);
-    portalMutation.mutate(
-      { data: undefined },
-      {
-        onSettled: () => setIsLoading(false),
-      }
-    );
-  };
-
-  const handleCancelSubscription = () => {
-    if (
-      confirm(
-        "Are you sure you want to cancel your subscription? You'll continue to have access until the end of your billing period."
-      )
-    ) {
-      setIsLoading(true);
-      cancelMutation.mutate(
-        { data: undefined },
-        {
-          onSettled: () => setIsLoading(false),
-        }
-      );
-    }
-  };
-
-  if (planLoading) {
-    return (
-      <Page>
-        <PageTitle title="Settings" />
-        <div className="space-y-6">
-          {/* Subscription Status Skeleton */}
-          <div className="bg-card rounded-lg border p-6">
-            <div className="space-y-4">
-              <div className="h-6 bg-gray-200 animate-pulse rounded w-1/3" />
-              <div className="h-4 bg-gray-200 animate-pulse rounded w-2/3" />
-              <div className="h-4 bg-gray-200 animate-pulse rounded w-1/2" />
-            </div>
-          </div>
-
-          {/* Pricing Cards Skeleton */}
-          <div>
-            <div className="h-8 bg-gray-200 animate-pulse rounded w-1/4 mb-6" />
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="bg-card rounded-lg border p-6">
-                  <div className="space-y-4">
-                    <div className="h-8 bg-gray-200 animate-pulse rounded w-2/3" />
-                    <div className="h-12 bg-gray-200 animate-pulse rounded w-1/2" />
-                    <div className="space-y-2">
-                      {Array.from({ length: 4 }).map((_, j) => (
-                        <div
-                          key={j}
-                          className="h-4 bg-gray-200 animate-pulse rounded"
-                        />
-                      ))}
-                    </div>
-                    <div className="h-10 bg-gray-200 animate-pulse rounded" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </Page>
-    );
-  }
-
-  const currentPlan = (userPlan?.data?.plan || "free") as
-    | "free"
-    | "basic"
-    | "pro";
-  const subscriptionStatus = userPlan?.data?.subscriptionStatus;
-  const subscriptionExpiresAt = userPlan?.data?.subscriptionExpiresAt
-    ? new Date(userPlan.data.subscriptionExpiresAt)
-    : null;
-
-  // Determine if sections should be shown
-  const hasNoPlan = !currentPlan || currentPlan === "free";
-  const isNotSubscribed = !subscriptionStatus;
-
   return (
     <Page>
       <div className="space-y-8">
         <AppBreadcrumb
           items={[
-            { label: "Home", href: "/", icon: Home },
+            { label: "Profile", href: "/profile", icon: User },
             { label: "Settings" },
           ]}
         />
@@ -454,56 +343,6 @@ function SettingsPage() {
         <section>
           <ProfileSettings />
         </section>
-
-        {/* Current Subscription Status */}
-        {!isNotSubscribed && (
-          <section>
-            <SubscriptionStatus
-              plan={currentPlan}
-              subscriptionStatus={subscriptionStatus as any}
-              subscriptionExpiresAt={subscriptionExpiresAt}
-              onManageBilling={handleManageBilling}
-              onCancelSubscription={handleCancelSubscription}
-              isLoading={isLoading}
-            />
-          </section>
-        )}
-
-        {/* Pricing Plans */}
-        {hasNoPlan && (
-          <section>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-foreground mb-2">
-                Choose Your Plan
-              </h2>
-              <p className="text-muted-foreground">
-                Upgrade or change your subscription plan to unlock more
-                features.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <PricingCard
-                plan={SUBSCRIPTION_PLANS.FREE}
-                currentPlan={currentPlan}
-                isLoading={isLoading}
-              />
-              <PricingCard
-                plan={SUBSCRIPTION_PLANS.BASIC}
-                currentPlan={currentPlan}
-                onUpgrade={handleUpgrade}
-                isLoading={isLoading}
-                isPopular={true}
-              />
-              <PricingCard
-                plan={SUBSCRIPTION_PLANS.PRO}
-                currentPlan={currentPlan}
-                onUpgrade={handleUpgrade}
-                isLoading={isLoading}
-              />
-            </div>
-          </section>
-        )}
 
         {/* Account Deletion */}
         <section>

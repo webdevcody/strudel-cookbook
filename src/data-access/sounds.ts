@@ -1,12 +1,20 @@
 import { eq, desc, ilike } from "drizzle-orm";
 import { database } from "~/db";
-import { sound, type Sound, type CreateSoundData, type UpdateSoundData } from "~/db/schema";
+import { sound, user, type Sound, type User, type CreateSoundData, type UpdateSoundData } from "~/db/schema";
 import { findTagsBySoundId } from "./tags";
 
-export async function findSoundById(id: string): Promise<(Sound & { tags: Array<{id: string, name: string}> }) | null> {
+export async function findSoundById(id: string): Promise<(Sound & { tags: Array<{id: string, name: string}>, user: Pick<User, 'id' | 'name' | 'image'> }) | null> {
   const [result] = await database
-    .select()
+    .select({
+      sound: sound,
+      user: {
+        id: user.id,
+        name: user.name,
+        image: user.image,
+      }
+    })
     .from(sound)
+    .innerJoin(user, eq(sound.userId, user.id))
     .where(eq(sound.id, id))
     .limit(1);
 
@@ -17,8 +25,9 @@ export async function findSoundById(id: string): Promise<(Sound & { tags: Array<
   const tags = await findTagsBySoundId(id);
   
   return {
-    ...result,
-    tags: tags.map(tag => ({ id: tag.id, name: tag.name }))
+    ...result.sound,
+    tags: tags.map(tag => ({ id: tag.id, name: tag.name })),
+    user: result.user
   };
 }
 

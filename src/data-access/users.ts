@@ -2,9 +2,14 @@ import { eq } from "drizzle-orm";
 import { database } from "~/db";
 import { user, type User, type SubscriptionPlan } from "~/db/schema";
 
-export async function findUserById(id: string): Promise<User | null> {
+export async function findUserById(id: string): Promise<Pick<User, 'id' | 'name' | 'image' | 'createdAt'> | null> {
   const [result] = await database
-    .select()
+    .select({
+      id: user.id,
+      name: user.name,
+      image: user.image,
+      createdAt: user.createdAt,
+    })
     .from(user)
     .where(eq(user.id, id))
     .limit(1);
@@ -17,7 +22,12 @@ export async function getUserPlan(userId: string): Promise<{
   isActive: boolean;
   expiresAt: Date | null;
 }> {
-  const userData = await findUserById(userId);
+  // Get full user data for plan checking (internal use only)
+  const [userData] = await database
+    .select()
+    .from(user)
+    .where(eq(user.id, userId))
+    .limit(1);
   
   if (!userData) {
     return { 

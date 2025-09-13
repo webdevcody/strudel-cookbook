@@ -12,7 +12,7 @@ import {
   Upload,
   Code,
 } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { UserAvatar } from "./UserAvatar";
 import { useUserAvatar } from "~/hooks/useUserAvatar";
 import {
   DropdownMenu,
@@ -155,14 +155,11 @@ export function Header({}: HeaderProps = {}) {
                       variant="ghost"
                       className="relative h-8 w-8 rounded-full"
                     >
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={avatarUrl || undefined} />
-                        <AvatarFallback className="bg-primary/10">
-                          {session?.user?.name?.charAt(0)?.toUpperCase() || (
-                            <User className="h-4 w-4" />
-                          )}
-                        </AvatarFallback>
-                      </Avatar>
+                      <UserAvatar
+                        imageUrl={avatarUrl}
+                        userName={session?.user?.name}
+                        className="h-8 w-8"
+                      />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -178,7 +175,7 @@ export function Header({}: HeaderProps = {}) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/profile">
+                      <Link to="/profiles/$userId" params={{ userId: session.user.id }}>
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
                       </Link>
