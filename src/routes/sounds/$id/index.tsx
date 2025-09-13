@@ -9,6 +9,7 @@ import {
   ArrowLeft,
   Loader2,
   ExternalLink,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -21,6 +22,15 @@ import { SoundTags } from "~/components/SoundTags";
 import { getSoundByIdQuery } from "~/queries/sounds";
 import { authClient } from "~/lib/auth-client";
 import { openInStrudel } from "~/utils/strudel";
+import { useDeleteSound } from "~/hooks/useSounds";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 
 export const Route = createFileRoute("/sounds/$id/")({
   loader: ({ context: { queryClient }, params: { id } }) => {
@@ -33,6 +43,8 @@ function SoundDetail() {
   const { id } = Route.useParams();
   const { data: sound, isLoading, error } = useQuery(getSoundByIdQuery(id));
   const [isCopying, setIsCopying] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const deleteSoundMutation = useDeleteSound(true); // Enable redirect after delete
 
   // Get current user session to check if user can edit
   const { data: session } = authClient.useSession();
@@ -54,6 +66,22 @@ function SoundDetail() {
   const handlePlayInStrudel = () => {
     if (!sound?.strudelCode) return;
     openInStrudel(sound.strudelCode);
+  };
+
+  const handleDeleteClick = () => {
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!sound) return;
+    
+    try {
+      await deleteSoundMutation.mutateAsync(sound.id);
+      setDeleteDialogOpen(false);
+      // Navigation to my-sounds will happen automatically via the hook
+    } catch (error) {
+      // Error handling is done in the hook
+    }
   };
 
   const formatDate = (date: Date | string) => {
@@ -110,14 +138,13 @@ function SoundDetail() {
       <div className="space-y-8">
         <AppBreadcrumb items={breadcrumbItems} />
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Code Display - Main Content */}
-          <div className="flex-1 space-y-6">
-            {/* Header */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">{sound.title}</h1>
-                {canEdit && (
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-bold">{sound.title}</h1>
+              {canEdit && (
+                <div className="flex items-center gap-2">
                   <Button asChild>
                     <Link
                       to="/sounds/$id/edit"
@@ -128,93 +155,122 @@ function SoundDetail() {
                       Edit
                     </Link>
                   </Button>
-                )}
-              </div>
-
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  Created {formatDate(sound.createdAt)}
-                </span>
-                <span>•</span>
-                <span>{sound.strudelCode.length} characters</span>
-              </div>
-            </div>
-
-            {/* Code Block */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold">Strudel Code</h2>
-                <div className="flex items-center gap-2">
                   <Button
-                    onClick={handlePlayInStrudel}
-                    size="sm"
+                    variant="destructive"
+                    onClick={handleDeleteClick}
+                    disabled={deleteSoundMutation.isPending}
                     className="flex items-center gap-2"
                   >
-                    <ExternalLink className="h-4 w-4" />
-                    Play in Strudel
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleCopyCode}
-                    disabled={isCopying}
-                    className="flex items-center gap-2"
-                  >
-                    {isCopying ? (
+                    {deleteSoundMutation.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Copy className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" />
                     )}
-                    {isCopying ? "Copying..." : "Copy Code"}
+                    {deleteSoundMutation.isPending ? "Deleting..." : "Delete"}
                   </Button>
                 </div>
-              </div>
-
-              <CodeMirrorEditor
-                value={sound.strudelCode}
-                readOnly={true}
-                height="500px"
-                theme="dark"
-                className="w-full"
-              />
+              )}
             </div>
 
-            {/* Comments Section */}
-            <SoundComments soundId={id} />
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:w-80 space-y-6">
-            {/* Sound Info */}
-            <div className="border rounded-lg p-4 space-y-3">
-              <h3 className="font-semibold text-sm">Sound Info</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Created:</span>
-                  <span>{formatDate(sound.createdAt)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Updated:</span>
-                  <span>{formatDate(sound.updatedAt)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Code length:</span>
-                  <span>{sound.strudelCode.length} chars</span>
-                </div>
-              </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                Created {formatDate(sound.createdAt)}
+              </span>
+              <span>•</span>
+              <span>{sound.strudelCode.length} characters</span>
             </div>
 
-            {/* Tags */}
+            {/* Tags near title */}
             {sound.tags && sound.tags.length > 0 && (
-              <div className="border rounded-lg p-4 space-y-3">
-                <h3 className="font-semibold text-sm">Tags</h3>
+              <div className="space-y-2">
+                <h3 className="font-medium text-sm text-muted-foreground">Tags</h3>
                 <SoundTags tags={sound.tags} />
               </div>
             )}
           </div>
+
+          {/* Code Block */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Strudel Code</h2>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={handlePlayInStrudel}
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Play in Strudel
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopyCode}
+                  disabled={isCopying}
+                  className="flex items-center gap-2"
+                >
+                  {isCopying ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Copy className="h-4 w-4" />
+                  )}
+                  {isCopying ? "Copying..." : "Copy Code"}
+                </Button>
+              </div>
+            </div>
+
+            <CodeMirrorEditor
+              value={sound.strudelCode}
+              readOnly={true}
+              height="500px"
+              theme="dark"
+              className="w-full"
+            />
+          </div>
+
+          {/* Comments Section */}
+          <SoundComments soundId={id} />
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Sound</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete "{sound.title}"? This action cannot be undone and will permanently remove your Strudel composition.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteSoundMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={deleteSoundMutation.isPending}
+            >
+              {deleteSoundMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Sound
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Page>
   );
 }

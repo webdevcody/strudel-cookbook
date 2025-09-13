@@ -1,24 +1,15 @@
 import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Code, Loader2, Save, ArrowLeft, Home, Trash2 } from "lucide-react";
+import { Code, Loader2, Save, ArrowLeft, Home } from "lucide-react";
 import { z } from "zod";
-import { useEffect, useState } from "react";
 import { Page } from "~/components/Page";
 import { PageTitle } from "~/components/PageTitle";
 import { Button } from "~/components/ui/button";
 import { SoundForm, SoundFormData } from "~/components/SoundForm";
 import { getSoundByIdQuery } from "~/queries/sounds";
 import { getTagsBySoundIdQuery } from "~/queries/tags";
-import { useUpdateSound, useDeleteSound } from "~/hooks/useSounds";
+import { useUpdateSound } from "~/hooks/useSounds";
 import { authClient } from "~/lib/auth-client";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 
 export const Route = createFileRoute("/sounds/$id/edit")({
@@ -45,8 +36,6 @@ function EditSound() {
   const { data: sound, isLoading, error } = useQuery(getSoundByIdQuery(id));
   const { data: soundTags, isLoading: isTagsLoading } = useQuery(getTagsBySoundIdQuery(id));
   const updateSoundMutation = useUpdateSound();
-  const deleteSoundMutation = useDeleteSound(true); // Enable redirect after delete
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { data: session } = authClient.useSession();
 
@@ -64,21 +53,6 @@ function EditSound() {
     }
   };
 
-  const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!sound) return;
-    
-    try {
-      await deleteSoundMutation.mutateAsync(sound.id);
-      setDeleteDialogOpen(false);
-      // Navigation to my-sounds will happen automatically via the hook
-    } catch (error) {
-      // Error handling is done in the hook
-    }
-  };
 
   if (isLoading || isTagsLoading) {
     return (
@@ -141,7 +115,6 @@ function EditSound() {
   ];
 
   const isSubmitting = updateSoundMutation.isPending;
-  const isDeleting = deleteSoundMutation.isPending;
 
   // Prepare default values for the form
   const defaultValues: SoundFormData = {
@@ -155,27 +128,10 @@ function EditSound() {
       <div className="space-y-8">
         <AppBreadcrumb items={breadcrumbItems} />
 
-        <div className="flex items-center justify-between">
-          <PageTitle
-            title="Edit Sound"
-            description="Update your Strudel composition"
-          />
-          <div className="flex items-center gap-2">
-            <Button
-              variant="destructive"
-              onClick={handleDeleteClick}
-              disabled={isSubmitting || isDeleting}
-              className="flex items-center gap-2"
-            >
-              {isDeleting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Trash2 className="h-4 w-4" />
-              )}
-              {isDeleting ? "Deleting..." : "Delete"}
-            </Button>
-          </div>
-        </div>
+        <PageTitle
+          title="Edit Sound"
+          description="Update your Strudel composition"
+        />
 
         <div className="max-w-2xl">
           <SoundForm
@@ -189,44 +145,6 @@ function EditSound() {
           />
         </div>
       </div>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Sound</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete "{sound.title}"? This action cannot be undone and will permanently remove your Strudel composition.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              disabled={deleteSoundMutation.isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-              disabled={deleteSoundMutation.isPending}
-            >
-              {deleteSoundMutation.isPending ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                <>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Sound
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </Page>
   );
 }
