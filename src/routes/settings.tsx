@@ -326,12 +326,18 @@ function ProfileSettings() {
 }
 
 function SettingsPage() {
+  const { data: session } = authClient.useSession();
+
   return (
     <Page>
       <div className="space-y-8">
         <AppBreadcrumb
           items={[
-            { label: "Profile", href: "/profile", icon: User },
+            {
+              label: "Profile",
+              href: session?.user?.id ? `/profiles/${session.user.id}` : "/",
+              icon: User
+            },
             { label: "Settings" },
           ]}
         />
