@@ -121,13 +121,6 @@ export function Header({}: HeaderProps = {}) {
                       Submit Sound
                     </Link>
                     <Link
-                      to="/my-songs"
-                      className="block px-2 py-1 text-lg transition-colors hover:text-foreground/80 text-foreground/60"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      My Songs
-                    </Link>
-                    <Link
                       to="/my-sounds"
                       className="block px-2 py-1 text-lg transition-colors hover:text-foreground/80 text-foreground/60"
                       onClick={() => setMobileMenuOpen(false)}
@@ -175,17 +168,15 @@ export function Header({}: HeaderProps = {}) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/profiles/$userId" params={{ userId: session.user.id }}>
+                      <Link
+                        to="/profiles/$userId"
+                        params={{ userId: session.user.id }}
+                      >
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link to="/my-songs">
-                        <Music className="mr-2 h-4 w-4" />
-                        <span>My Songs</span>
-                      </Link>
-                    </DropdownMenuItem>
+
                     <DropdownMenuItem asChild>
                       <Link to="/my-sounds">
                         <Code className="mr-2 h-4 w-4" />
