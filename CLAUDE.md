@@ -30,7 +30,7 @@ This is a TanStack Start full-stack React application with the following key arc
 
 ### Database Schema
 
-Core entities: `user`, `song`, `playlist`, `heart` (likes), with subscription and authentication tables. Users can upload songs, create playlists, and have subscription plans (free/basic/pro).
+Core entities: `user`, `song`, `heart` (likes), with subscription and authentication tables. Users can upload songs and have subscription plans (free/basic/pro).
 
 ### Key Patterns
 
@@ -78,7 +78,7 @@ npm run stripe:listen      # Listen for Stripe webhooks in development
 - Uses TanStack Start's file-based routing system
 - Database schema uses UUIDs for primary keys
 - File uploads go directly to cloud storage via presigned URLs
-- Subscription plans control feature access (playlists, upload limits)
+- Subscription plans control feature access (upload limits)
 - Build process includes TypeScript type checking
 
 ## Additional Information

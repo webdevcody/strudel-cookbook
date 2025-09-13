@@ -17,7 +17,9 @@ export const user = pgTable("user", {
   image: text("image"),
   stripeCustomerId: text("stripe_customer_id"),
   subscriptionId: text("subscription_id"),
-  plan: text("plan").$default(() => "free").notNull(),
+  plan: text("plan")
+    .$default(() => "free")
+    .notNull(),
   subscriptionStatus: text("subscription_status"),
   subscriptionExpiresAt: timestamp("subscription_expires_at"),
   createdAt: timestamp("created_at")
@@ -115,13 +117,10 @@ export const heart = pgTable("heart", {
     .notNull(),
 });
 
-export const playlist = pgTable("playlist", {
+export const sound = pgTable("sound", {
   id: text("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
-  isPublic: boolean("is_public")
-    .$default(() => false)
-    .notNull(),
+  title: text("title").notNull(),
+  strudelCode: text("strudel_code").notNull(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -133,15 +132,39 @@ export const playlist = pgTable("playlist", {
     .notNull(),
 });
 
-export const playlistSong = pgTable("playlist_song", {
+export const soundComment = pgTable("sound_comment", {
   id: text("id").primaryKey(),
-  playlistId: text("playlist_id")
+  content: text("content").notNull(),
+  soundId: text("sound_id")
     .notNull()
-    .references(() => playlist.id, { onDelete: "cascade" }),
-  songId: text("song_id")
+    .references(() => sound.id, { onDelete: "cascade" }),
+  userId: text("user_id")
     .notNull()
-    .references(() => song.id, { onDelete: "cascade" }),
-  position: integer("position").notNull(),
+    .references(() => user.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const tag = pgTable("tag", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const soundTag = pgTable("sound_tag", {
+  id: text("id").primaryKey(),
+  soundId: text("sound_id")
+    .notNull()
+    .references(() => sound.id, { onDelete: "cascade" }),
+  tagId: text("tag_id")
+    .notNull()
+    .references(() => tag.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
@@ -153,7 +176,6 @@ export const songRelations = relations(song, ({ one, many }) => ({
     references: [user.id],
   }),
   hearts: many(heart),
-  playlistSongs: many(playlistSong),
 }));
 
 export const heartRelations = relations(heart, ({ one }) => ({
@@ -167,49 +189,78 @@ export const heartRelations = relations(heart, ({ one }) => ({
   }),
 }));
 
-export const playlistRelations = relations(playlist, ({ one, many }) => ({
+export const soundRelations = relations(sound, ({ one, many }) => ({
   user: one(user, {
-    fields: [playlist.userId],
+    fields: [sound.userId],
     references: [user.id],
   }),
-  playlistSongs: many(playlistSong),
+  comments: many(soundComment),
+  soundTags: many(soundTag),
 }));
 
-export const playlistSongRelations = relations(playlistSong, ({ one }) => ({
-  playlist: one(playlist, {
-    fields: [playlistSong.playlistId],
-    references: [playlist.id],
+export const soundCommentRelations = relations(soundComment, ({ one }) => ({
+  user: one(user, {
+    fields: [soundComment.userId],
+    references: [user.id],
   }),
-  song: one(song, {
-    fields: [playlistSong.songId],
-    references: [song.id],
+  sound: one(sound, {
+    fields: [soundComment.soundId],
+    references: [sound.id],
+  }),
+}));
+
+export const tagRelations = relations(tag, ({ many }) => ({
+  soundTags: many(soundTag),
+}));
+
+export const soundTagRelations = relations(soundTag, ({ one }) => ({
+  sound: one(sound, {
+    fields: [soundTag.soundId],
+    references: [sound.id],
+  }),
+  tag: one(tag, {
+    fields: [soundTag.tagId],
+    references: [tag.id],
   }),
 }));
 
 export const userRelations = relations(user, ({ many }) => ({
   songs: many(song),
   hearts: many(heart),
-  playlists: many(playlist),
+  sounds: many(sound),
+  soundComments: many(soundComment),
 }));
 
 export type Song = typeof song.$inferSelect;
 export type CreateSongData = typeof song.$inferInsert;
-export type UpdateSongData = Partial<
-  Omit<CreateSongData, "id" | "createdAt">
->;
+export type UpdateSongData = Partial<Omit<CreateSongData, "id" | "createdAt">>;
 
 export type User = typeof user.$inferSelect;
 export type Heart = typeof heart.$inferSelect;
 export type CreateHeartData = typeof heart.$inferInsert;
 
-export type Playlist = typeof playlist.$inferSelect;
-export type CreatePlaylistData = typeof playlist.$inferInsert;
-export type UpdatePlaylistData = Partial<
-  Omit<CreatePlaylistData, "id" | "createdAt">
+export type Sound = typeof sound.$inferSelect;
+export type CreateSoundData = typeof sound.$inferInsert;
+export type UpdateSoundData = Partial<
+  Omit<CreateSoundData, "id" | "createdAt">
 >;
 
-export type PlaylistSong = typeof playlistSong.$inferSelect;
-export type CreatePlaylistSongData = typeof playlistSong.$inferInsert;
+export type SoundComment = typeof soundComment.$inferSelect;
+export type CreateSoundCommentData = typeof soundComment.$inferInsert;
+export type UpdateSoundCommentData = Partial<
+  Omit<CreateSoundCommentData, "id" | "createdAt">
+>;
+
+export type Tag = typeof tag.$inferSelect;
+export type CreateTagData = typeof tag.$inferInsert;
+
+export type SoundTag = typeof soundTag.$inferSelect;
+export type CreateSoundTagData = typeof soundTag.$inferInsert;
 
 export type SubscriptionPlan = "free" | "basic" | "pro";
-export type SubscriptionStatus = "active" | "canceled" | "past_due" | "unpaid" | "incomplete";
+export type SubscriptionStatus =
+  | "active"
+  | "canceled"
+  | "past_due"
+  | "unpaid"
+  | "incomplete";

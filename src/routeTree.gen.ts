@@ -16,11 +16,14 @@ import { Route as UnauthenticatedRouteImport } from './routes/unauthenticated'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as PlaylistsRouteImport } from './routes/playlists'
+import { Route as MySoundsRouteImport } from './routes/my-sounds'
 import { Route as MySongsRouteImport } from './routes/my-songs'
 import { Route as BrowseRouteImport } from './routes/browse'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SoundsCreateRouteImport } from './routes/sounds/create'
+import { Route as SoundsIdIndexRouteImport } from './routes/sounds/$id/index'
 import { Route as SongIdIndexRouteImport } from './routes/song/$id/index'
+import { Route as SoundsIdEditRouteImport } from './routes/sounds/$id/edit'
 import { Route as SongIdEditRouteImport } from './routes/song/$id/edit'
 import { ServerRoute as ApiStripeWebhookServerRouteImport } from './routes/api/stripe/webhook'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
@@ -52,9 +55,9 @@ const SettingsRoute = SettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PlaylistsRoute = PlaylistsRouteImport.update({
-  id: '/playlists',
-  path: '/playlists',
+const MySoundsRoute = MySoundsRouteImport.update({
+  id: '/my-sounds',
+  path: '/my-sounds',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MySongsRoute = MySongsRouteImport.update({
@@ -72,9 +75,24 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SoundsCreateRoute = SoundsCreateRouteImport.update({
+  id: '/sounds/create',
+  path: '/sounds/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SoundsIdIndexRoute = SoundsIdIndexRouteImport.update({
+  id: '/sounds/$id/',
+  path: '/sounds/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SongIdIndexRoute = SongIdIndexRouteImport.update({
   id: '/song/$id/',
   path: '/song/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SoundsIdEditRoute = SoundsIdEditRouteImport.update({
+  id: '/sounds/$id/edit',
+  path: '/sounds/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SongIdEditRoute = SongIdEditRouteImport.update({
@@ -97,41 +115,50 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
-  '/playlists': typeof PlaylistsRoute
+  '/my-sounds': typeof MySoundsRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
+  '/sounds/create': typeof SoundsCreateRoute
   '/song/$id/edit': typeof SongIdEditRoute
+  '/sounds/$id/edit': typeof SoundsIdEditRoute
   '/song/$id': typeof SongIdIndexRoute
+  '/sounds/$id': typeof SoundsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
-  '/playlists': typeof PlaylistsRoute
+  '/my-sounds': typeof MySoundsRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
+  '/sounds/create': typeof SoundsCreateRoute
   '/song/$id/edit': typeof SongIdEditRoute
+  '/sounds/$id/edit': typeof SoundsIdEditRoute
   '/song/$id': typeof SongIdIndexRoute
+  '/sounds/$id': typeof SoundsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
-  '/playlists': typeof PlaylistsRoute
+  '/my-sounds': typeof MySoundsRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
+  '/sounds/create': typeof SoundsCreateRoute
   '/song/$id/edit': typeof SongIdEditRoute
+  '/sounds/$id/edit': typeof SoundsIdEditRoute
   '/song/$id/': typeof SongIdIndexRoute
+  '/sounds/$id/': typeof SoundsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -139,54 +166,66 @@ export interface FileRouteTypes {
     | '/'
     | '/browse'
     | '/my-songs'
-    | '/playlists'
+    | '/my-sounds'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/unauthenticated'
     | '/upload'
+    | '/sounds/create'
     | '/song/$id/edit'
+    | '/sounds/$id/edit'
     | '/song/$id'
+    | '/sounds/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/browse'
     | '/my-songs'
-    | '/playlists'
+    | '/my-sounds'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/unauthenticated'
     | '/upload'
+    | '/sounds/create'
     | '/song/$id/edit'
+    | '/sounds/$id/edit'
     | '/song/$id'
+    | '/sounds/$id'
   id:
     | '__root__'
     | '/'
     | '/browse'
     | '/my-songs'
-    | '/playlists'
+    | '/my-sounds'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
     | '/unauthenticated'
     | '/upload'
+    | '/sounds/create'
     | '/song/$id/edit'
+    | '/sounds/$id/edit'
     | '/song/$id/'
+    | '/sounds/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BrowseRoute: typeof BrowseRoute
   MySongsRoute: typeof MySongsRoute
-  PlaylistsRoute: typeof PlaylistsRoute
+  MySoundsRoute: typeof MySoundsRoute
   SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
   UnauthenticatedRoute: typeof UnauthenticatedRoute
   UploadRoute: typeof UploadRoute
+  SoundsCreateRoute: typeof SoundsCreateRoute
   SongIdEditRoute: typeof SongIdEditRoute
+  SoundsIdEditRoute: typeof SoundsIdEditRoute
   SongIdIndexRoute: typeof SongIdIndexRoute
+  SoundsIdIndexRoute: typeof SoundsIdIndexRoute
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
@@ -251,11 +290,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/playlists': {
-      id: '/playlists'
-      path: '/playlists'
-      fullPath: '/playlists'
-      preLoaderRoute: typeof PlaylistsRouteImport
+    '/my-sounds': {
+      id: '/my-sounds'
+      path: '/my-sounds'
+      fullPath: '/my-sounds'
+      preLoaderRoute: typeof MySoundsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-songs': {
@@ -279,11 +318,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sounds/create': {
+      id: '/sounds/create'
+      path: '/sounds/create'
+      fullPath: '/sounds/create'
+      preLoaderRoute: typeof SoundsCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sounds/$id/': {
+      id: '/sounds/$id/'
+      path: '/sounds/$id'
+      fullPath: '/sounds/$id'
+      preLoaderRoute: typeof SoundsIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/song/$id/': {
       id: '/song/$id/'
       path: '/song/$id'
       fullPath: '/song/$id'
       preLoaderRoute: typeof SongIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sounds/$id/edit': {
+      id: '/sounds/$id/edit'
+      path: '/sounds/$id/edit'
+      fullPath: '/sounds/$id/edit'
+      preLoaderRoute: typeof SoundsIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/song/$id/edit': {
@@ -318,14 +378,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BrowseRoute: BrowseRoute,
   MySongsRoute: MySongsRoute,
-  PlaylistsRoute: PlaylistsRoute,
+  MySoundsRoute: MySoundsRoute,
   SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
   UnauthenticatedRoute: UnauthenticatedRoute,
   UploadRoute: UploadRoute,
+  SoundsCreateRoute: SoundsCreateRoute,
   SongIdEditRoute: SongIdEditRoute,
+  SoundsIdEditRoute: SoundsIdEditRoute,
   SongIdIndexRoute: SongIdIndexRoute,
+  SoundsIdIndexRoute: SoundsIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

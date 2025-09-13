@@ -8,10 +8,9 @@ import {
   Menu,
   Settings,
   AudioWaveform,
-  List,
   Music,
-  ListMusic,
   Upload,
+  Code,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useUserAvatar } from "~/hooks/useUserAvatar";
@@ -26,7 +25,6 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { useState } from "react";
 import * as React from "react";
-import { usePlaylist } from "./playlist-provider";
 
 const navigationLinks = [
   {
@@ -39,23 +37,13 @@ const navigationLinks = [
   },
 ];
 
-interface HeaderProps {
-  onOpenPlaylist?: () => void;
-}
+interface HeaderProps {}
 
-export function Header({ onOpenPlaylist }: HeaderProps = {}) {
+export function Header({}: HeaderProps = {}) {
   const { data: session, isPending, error } = authClient.useSession();
-  
-  // Debug logging for session state
-  React.useEffect(() => {
-    console.log('Header useSession state:', { session, isPending, error });
-    if (error) {
-      console.error('useSession error:', error);
-    }
-  }, [session, isPending, error]);
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { avatarUrl } = useUserAvatar();
-  const { playlist, showPlayer } = usePlaylist();
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -83,8 +71,8 @@ export function Header({ onOpenPlaylist }: HeaderProps = {}) {
                 to="/upload"
                 className="flex items-center gap-2 transition-colors hover:text-foreground/80 text-foreground/60"
               >
-                <Upload className="h-4 w-4" />
-                Upload
+                <Code className="h-4 w-4" />
+                Submit Sound
               </Link>
             )}
           </nav>
@@ -129,8 +117,8 @@ export function Header({ onOpenPlaylist }: HeaderProps = {}) {
                       className="flex items-center gap-2 px-2 py-1 text-lg transition-colors hover:text-foreground/80 text-foreground/60"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Upload className="h-5 w-5" />
-                      Upload
+                      <Code className="h-5 w-5" />
+                      Submit Sound
                     </Link>
                     <Link
                       to="/my-songs"
@@ -140,11 +128,11 @@ export function Header({ onOpenPlaylist }: HeaderProps = {}) {
                       My Songs
                     </Link>
                     <Link
-                      to="/playlists"
+                      to="/my-sounds"
                       className="block px-2 py-1 text-lg transition-colors hover:text-foreground/80 text-foreground/60"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      My Playlists
+                      My Sounds
                     </Link>
                   </>
                 )}
@@ -155,27 +143,6 @@ export function Header({ onOpenPlaylist }: HeaderProps = {}) {
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <div className="w-full flex-1 md:w-auto md:flex-none"></div>
           <nav className="flex items-center gap-4">
-            {/* Playlist button - show at all times */}
-            {onOpenPlaylist && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  showPlayer(); // Show the music player if hidden
-                  onOpenPlaylist(); // Open the playlist sheet
-                }}
-                className="relative"
-              >
-                <List className="h-4 w-4" />
-                {playlist.length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {playlist.length}
-                  </span>
-                )}
-                <span className="sr-only">Open playlist</span>
-              </Button>
-            )}
-
             {isPending ? (
               <div className="flex h-9 w-9 items-center justify-center">
                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
@@ -217,9 +184,9 @@ export function Header({ onOpenPlaylist }: HeaderProps = {}) {
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link to="/playlists">
-                        <ListMusic className="mr-2 h-4 w-4" />
-                        <span>My Playlists</span>
+                      <Link to="/my-sounds">
+                        <Code className="mr-2 h-4 w-4" />
+                        <span>My Sounds</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

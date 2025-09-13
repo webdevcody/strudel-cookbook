@@ -1,60 +1,35 @@
 import { useEffect, useRef, useState } from "react";
-import { 
-  Play, 
-  Pause, 
-  SkipForward, 
-  SkipBack, 
-  Volume2, 
-  VolumeX, 
-  List,
+import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
   X,
-  Repeat,
-  Shuffle
 } from "lucide-react";
 import { Button } from "~/components/ui/button";
-import { Tooltip } from "~/components/ui/tooltip";
 import { Slider } from "~/components/ui/slider";
-import { usePlaylist } from "~/components/playlist-provider";
 import { formatDuration } from "~/utils/song";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-// Temporary import for complex loading logic - to be refactored later
 import { getCoverImageUrlFn } from "~/fn/audio-storage";
 import { incrementPlayCountFn } from "~/fn/songs";
+import type { Song } from "~/db/schema";
 
 interface MusicPlayerProps {
-  onOpenPlaylist: () => void;
+  song: Song | null;
+  isVisible: boolean;
+  onClose: () => void;
 }
 
-export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
-  const {
-    currentSong,
-    isPlaying,
-    currentTime,
-    duration,
-    volume,
-    isLooping,
-    isShuffling,
-    isPlayerVisible,
-    playNext,
-    playPrevious,
-    togglePlay,
-    seekTo,
-    setVolume,
-    updateCurrentTime,
-    updateDuration,
-    clearPlaylist,
-    toggleLoop,
-    toggleShuffle,
-    showPlayer,
-    hidePlayer,
-    playlist,
-    currentIndex
-  } = usePlaylist();
+export function MusicPlayer({ song, isVisible, onClose }: MusicPlayerProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasStartedPlaying, setHasStartedPlaying] = useState(false);
   const queryClient = useQueryClient();
 
   const incrementPlayMutation = useMutation({
@@ -64,26 +39,22 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
       queryClient.invalidateQueries({ queryKey: ['recent-songs'] });
       queryClient.invalidateQueries({ queryKey: ['popular-songs'] });
       queryClient.invalidateQueries({ queryKey: ['user-songs'] });
-      if (currentSong) {
-        queryClient.invalidateQueries({ queryKey: ['song', currentSong.id] });
+      if (song) {
+        queryClient.invalidateQueries({ queryKey: ['song', song.id] });
       }
     },
   });
 
-  // Determine when buttons should be disabled
-  const isAtFirstSong = currentIndex === 0;
-  const isAtLastSong = currentIndex === playlist.length - 1;
-  const canGoNext = isLooping || isShuffling || !isAtLastSong;
-  const canGoPrevious = isLooping || !isAtFirstSong;
-
-  // Update audio element when current song changes
+  // Update audio element when song changes
   useEffect(() => {
-    if (audioRef.current && currentSong?.audioUrl) {
-      audioRef.current.src = currentSong.audioUrl;
+    if (audioRef.current && song?.audioUrl) {
+      audioRef.current.src = song.audioUrl;
       audioRef.current.load();
-      setHasStartedPlaying(false); // Reset play tracking for new song
+      setHasStartedPlaying(false);
+      setIsPlaying(false);
+      setCurrentTime(0);
     }
-  }, [currentSong]);
+  }, [song]);
 
   // Handle play/pause state
   useEffect(() => {
@@ -93,7 +64,7 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
     } else {
       audioRef.current.pause();
     }
-  }, [isPlaying, currentSong]);
+  }, [isPlaying]);
 
   // Handle volume changes
   useEffect(() => {
@@ -102,7 +73,7 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
     }
   }, [volume]);
 
-  // Handle seeking - only when explicitly seeking, not during normal playback
+  // Handle seeking
   useEffect(() => {
     if (audioRef.current && !isDragging && Math.abs(audioRef.current.currentTime - currentTime) > 1) {
       audioRef.current.currentTime = currentTime;
@@ -111,35 +82,42 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
 
   const handleTimeUpdate = () => {
     if (audioRef.current && !isDragging) {
-      updateCurrentTime(audioRef.current.currentTime);
+      setCurrentTime(audioRef.current.currentTime);
     }
   };
 
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
-      // Ensure audio is properly configured
       audioRef.current.playbackRate = 1.0;
-      updateDuration(audioRef.current.duration);
+      setDuration(audioRef.current.duration);
     }
   };
 
   const handleCanPlay = () => {
     if (audioRef.current) {
-      // Double-check playback rate when audio is ready to play
       audioRef.current.playbackRate = 1.0;
     }
   };
 
   const handlePlay = () => {
     // Only increment play count once per song when it actually starts playing
-    if (currentSong && !hasStartedPlaying) {
+    if (song && !hasStartedPlaying) {
       setHasStartedPlaying(true);
-      incrementPlayMutation.mutate({ data: { songId: currentSong.id } });
+      incrementPlayMutation.mutate({ data: { songId: song.id } });
     }
   };
 
   const handleEnded = () => {
-    playNext();
+    setIsPlaying(false);
+    setCurrentTime(0);
+  };
+
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
+  };
+
+  const seekTo = (time: number) => {
+    setCurrentTime(time);
   };
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -149,7 +127,7 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
     const x = e.clientX - rect.left;
     const percentage = x / rect.width;
     const newTime = percentage * duration;
-    
+
     seekTo(newTime);
   };
 
@@ -164,7 +142,7 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
       const x = Math.max(0, Math.min(moveEvent.clientX - rect.left, rect.width));
       const percentage = x / rect.width;
       const newTime = percentage * duration;
-      
+
       seekTo(newTime);
     };
 
@@ -187,31 +165,21 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
   };
 
   const handleClose = () => {
-    // Just pause the music and hide the player, don't clear playlist
-    if (isPlaying) {
-      togglePlay();
-    }
-    hidePlayer();
+    setIsPlaying(false);
+    onClose();
   };
 
-  // Get the cover image URL from the coverImageKey - must be called before early return
+  // Get the cover image URL from the coverImageKey
   const { data: coverUrlData } = useQuery({
-    queryKey: ['cover-url', currentSong?.coverImageKey || 'no-key'],
+    queryKey: ['cover-url', song?.coverImageKey || 'no-key'],
     queryFn: () => {
-      if (!currentSong?.coverImageKey) return Promise.resolve(null);
-      return getCoverImageUrlFn({ data: { coverKey: currentSong.coverImageKey } });
+      if (!song?.coverImageKey) return Promise.resolve(null);
+      return getCoverImageUrlFn({ data: { coverKey: song.coverImageKey } });
     },
   });
 
-  // Auto-show player when a new song starts playing
-  useEffect(() => {
-    if (currentSong && isPlaying && !isPlayerVisible) {
-      showPlayer();
-    }
-  }, [currentSong, isPlaying, isPlayerVisible, showPlayer]);
-
-  // Don't render if no current song or manually hidden
-  if (!currentSong || !isPlayerVisible) {
+  // Don't render if no song or not visible
+  if (!song || !isVisible) {
     return null;
   }
 
@@ -261,7 +229,7 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
                 {displayCoverUrl ? (
                   <img
                     src={displayCoverUrl}
-                    alt={`${currentSong.title} cover`}
+                    alt={`${song.title} cover`}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -271,37 +239,13 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium truncate">{currentSong.title}</p>
-                <p className="text-xs text-muted-foreground truncate">{currentSong.artist}</p>
+                <p className="text-sm font-medium truncate">{song.title}</p>
+                <p className="text-xs text-muted-foreground truncate">{song.artist}</p>
               </div>
             </div>
 
             {/* Control buttons */}
             <div className="flex items-center space-x-1 mx-4">
-              {/* Shuffle button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleShuffle}
-                className={`${isShuffling ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                <Shuffle className="h-4 w-4" />
-              </Button>
-
-              <Tooltip
-                content={!canGoPrevious ? "Cannot go to previous song - you're at the first song and loop is disabled" : ""}
-                disabled={canGoPrevious}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={playPrevious}
-                  disabled={playlist.length <= 1 || !canGoPrevious}
-                >
-                  <SkipBack className="h-4 w-4" />
-                </Button>
-              </Tooltip>
-
               <Button
                 variant="ghost"
                 size="sm"
@@ -313,30 +257,6 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
                 ) : (
                   <Play className="h-5 w-5 ml-0.5" />
                 )}
-              </Button>
-
-              <Tooltip
-                content={!canGoNext ? "Cannot go to next song - you're at the last song and loop is disabled" : ""}
-                disabled={canGoNext}
-              >
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={playNext}
-                  disabled={playlist.length <= 1 || !canGoNext}
-                >
-                  <SkipForward className="h-4 w-4" />
-                </Button>
-              </Tooltip>
-
-              {/* Loop button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleLoop}
-                className={`${isLooping ? 'text-primary' : 'text-muted-foreground'}`}
-              >
-                <Repeat className="h-4 w-4" />
               </Button>
             </div>
 
@@ -365,15 +285,6 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
                 />
               </div>
 
-              {/* Playlist button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onOpenPlaylist}
-              >
-                <List className="h-4 w-4" />
-              </Button>
-
               {/* Close player button */}
               <Button
                 variant="ghost"
@@ -387,7 +298,6 @@ export function MusicPlayer({ onOpenPlaylist }: MusicPlayerProps) {
           </div>
         </div>
       </div>
-
     </>
   );
 }

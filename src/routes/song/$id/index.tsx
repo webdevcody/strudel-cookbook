@@ -5,8 +5,6 @@ import {
   Download,
   Loader2,
   Edit3,
-  Plus,
-  Check,
   Home,
   Music,
   Heart,
@@ -20,7 +18,6 @@ import { getSongByIdQuery } from "~/queries/songs";
 import { formatDuration, formatRelativeTime } from "~/utils/song";
 import { useAudioUrl, useCoverImageUrl } from "~/hooks/useAudioStorage";
 import { authClient } from "~/lib/auth-client";
-import { usePlaylist } from "~/components/playlist-provider";
 import { useSongBreadcrumbs } from "~/hooks/useSongBreadcrumbs";
 import { useHeartStatus, useToggleHeart } from "~/hooks/useHearts";
 import { SongPreviewPlayer } from "~/components/SongPreviewPlayer";
@@ -36,7 +33,6 @@ function SongDetail() {
   const { id } = Route.useParams();
   const { data: song, isLoading, error } = useQuery(getSongByIdQuery(id));
   const [isDownloading, setIsDownloading] = useState(false);
-  const { addToPlaylist, playlist } = usePlaylist();
   const breadcrumbItems = useSongBreadcrumbs(song?.title || "Song Details");
 
   // Get current user session to check if user can edit
@@ -134,25 +130,6 @@ function SongDetail() {
   // Check if current user can edit this song
   const canEdit = session?.user?.id === song.userId;
 
-  // Check if song is already in playlist
-  const isInPlaylist = song ? playlist.some((p) => p.id === song.id) : false;
-
-  const handleAddToPlaylist = () => {
-    if (!song || !displayAudioUrl) return;
-
-    if (isInPlaylist) {
-      toast.info("Song already in playlist");
-      return;
-    }
-
-    addToPlaylist({
-      ...song,
-      audioUrl: displayAudioUrl,
-      coverImageUrl: displayCoverUrl,
-    });
-
-    toast.success("Added to playlist");
-  };
 
   const handleHeartToggle = () => {
     if (!session?.user) {
@@ -184,27 +161,7 @@ function SongDetail() {
               )}
             </div>
 
-            {/* Add to Playlist Button */}
             <div className="space-y-4">
-              <Button
-                size="lg"
-                onClick={handleAddToPlaylist}
-                disabled={!song || !displayAudioUrl}
-                className="w-full"
-                variant={isInPlaylist ? "outline" : "default"}
-              >
-                {isInPlaylist ? (
-                  <>
-                    <Check className="h-5 w-5 mr-2" />
-                    In Playlist
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-5 w-5 mr-2" />
-                    Add to Playlist
-                  </>
-                )}
-              </Button>
               
               {/* Heart Button - only show for authenticated users */}
               {session?.user && (
