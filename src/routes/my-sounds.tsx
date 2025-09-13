@@ -10,6 +10,7 @@ import { PageTitle } from "~/components/PageTitle";
 import { Button } from "~/components/ui/button";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 import { getUserSoundsQuery } from "~/queries/sounds";
+import { StrudelIframe } from "~/components/StrudelIframe";
 
 export const Route = createFileRoute("/my-sounds")({
   loader: ({ context }) => {
@@ -110,12 +111,13 @@ function MySounds() {
                       </div>
                     </div>
 
-                    <div className="bg-muted/50 rounded-md p-3 relative group/code flex-1 flex flex-col min-h-0">
-                      <div className="overflow-auto flex-1">
-                        <pre className="text-xs font-mono text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                          {sound.strudelCode}
-                        </pre>
-                      </div>
+                    <div className="relative flex-1 flex flex-col min-h-0 rounded-md overflow-hidden">
+                      <StrudelIframe 
+                        strudelCode={sound.strudelCode}
+                        title={sound.title}
+                        className="w-full flex-1 min-h-[180px]"
+                        height="100%"
+                      />
                     </div>
 
                   </div>

@@ -10,19 +10,22 @@ import {
   Loader2,
   ExternalLink,
   Trash2,
+  Heart,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Page } from "~/components/Page";
 import { Button } from "~/components/ui/button";
-import { CodeMirrorEditor } from "~/components/ui/code-mirror";
 import { AppBreadcrumb } from "~/components/AppBreadcrumb";
 import { SoundComments } from "~/components/SoundComments";
 import { SoundTags } from "~/components/SoundTags";
 import { getSoundByIdQuery } from "~/queries/sounds";
+import { getSoundHeartStatusQuery } from "~/queries/sound-hearts";
 import { authClient } from "~/lib/auth-client";
 import { openInStrudel } from "~/utils/strudel";
+import { StrudelIframe } from "~/components/StrudelIframe";
 import { useDeleteSound } from "~/hooks/useSounds";
+import { useSoundHeartManagement } from "~/hooks/useSoundHearts";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +38,9 @@ import {
 export const Route = createFileRoute("/sounds/$id/")({
   loader: ({ context: { queryClient }, params: { id } }) => {
     queryClient.ensureQueryData(getSoundByIdQuery(id));
+    // Optionally preload heart status - this will only work if user is authenticated
+    // but won't break if they're not since the query will be disabled
+    queryClient.prefetchQuery(getSoundHeartStatusQuery(id));
   },
   component: SoundDetail,
 });
@@ -48,6 +54,14 @@ function SoundDetail() {
 
   // Get current user session to check if user can edit
   const { data: session } = authClient.useSession();
+
+  // Heart management
+  const {
+    heartStatus,
+    heartCount,
+    toggleHeart,
+    isLoading: heartLoading,
+  } = useSoundHeartManagement(id);
 
   const handleCopyCode = async () => {
     if (!sound?.strudelCode) return;
@@ -74,7 +88,7 @@ function SoundDetail() {
 
   const handleDeleteConfirm = async () => {
     if (!sound) return;
-    
+
     try {
       await deleteSoundMutation.mutateAsync(sound.id);
       setDeleteDialogOpen(false);
@@ -82,6 +96,14 @@ function SoundDetail() {
     } catch (error) {
       // Error handling is done in the hook
     }
+  };
+
+  const handleHeartToggle = () => {
+    if (!session) {
+      toast.error("You must be signed in to like sounds");
+      return;
+    }
+    toggleHeart.mutate(id);
   };
 
   const formatDate = (date: Date | string) => {
@@ -143,33 +165,59 @@ function SoundDetail() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold">{sound.title}</h1>
-              {canEdit && (
-                <div className="flex items-center gap-2">
-                  <Button asChild>
-                    <Link
-                      to="/sounds/$id/edit"
-                      params={{ id: sound.id }}
-                      className="flex items-center gap-2"
-                    >
-                      <Edit3 className="h-4 w-4" />
-                      Edit
-                    </Link>
-                  </Button>
+              <div className="flex items-center gap-2">
+                {/* Heart button - always visible if user is logged in */}
+                {session && (
                   <Button
-                    variant="destructive"
-                    onClick={handleDeleteClick}
-                    disabled={deleteSoundMutation.isPending}
+                    variant={
+                      heartStatus?.data?.isHearted ? "default" : "outline"
+                    }
+                    onClick={handleHeartToggle}
+                    disabled={heartLoading || toggleHeart.isPending}
                     className="flex items-center gap-2"
                   >
-                    {deleteSoundMutation.isPending ? (
+                    {toggleHeart.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <Trash2 className="h-4 w-4" />
+                      <Heart
+                        className={`h-4 w-4 ${
+                          heartStatus?.data?.isHearted ? "fill-current" : ""
+                        }`}
+                      />
                     )}
-                    {deleteSoundMutation.isPending ? "Deleting..." : "Delete"}
+                    {heartCount?.data?.heartCount || 0}
                   </Button>
-                </div>
-              )}
+                )}
+
+                {/* Edit/Delete buttons - only for owner */}
+                {canEdit && (
+                  <>
+                    <Button asChild>
+                      <Link
+                        to="/sounds/$id/edit"
+                        params={{ id: sound.id }}
+                        className="flex items-center gap-2"
+                      >
+                        <Edit3 className="h-4 w-4" />
+                        Edit
+                      </Link>
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={handleDeleteClick}
+                      disabled={deleteSoundMutation.isPending}
+                      className="flex items-center gap-2"
+                    >
+                      {deleteSoundMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-4 w-4" />
+                      )}
+                      {deleteSoundMutation.isPending ? "Deleting..." : "Delete"}
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
 
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -184,24 +232,27 @@ function SoundDetail() {
             {/* Tags near title */}
             {sound.tags && sound.tags.length > 0 && (
               <div className="space-y-2">
-                <h3 className="font-medium text-sm text-muted-foreground">Tags</h3>
+                <h3 className="font-medium text-sm text-muted-foreground">
+                  Tags
+                </h3>
                 <SoundTags tags={sound.tags} />
               </div>
             )}
           </div>
 
-          {/* Code Block */}
+          {/* Strudel Player */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Strudel Code</h2>
+              <h2 className="text-lg font-semibold">Strudel Player</h2>
               <div className="flex items-center gap-2">
                 <Button
                   onClick={handlePlayInStrudel}
                   size="sm"
+                  variant="outline"
                   className="flex items-center gap-2"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  Play in Strudel
+                  Open in Studel.cc
                 </Button>
                 <Button
                   variant="outline"
@@ -220,12 +271,10 @@ function SoundDetail() {
               </div>
             </div>
 
-            <CodeMirrorEditor
-              value={sound.strudelCode}
-              readOnly={true}
+            <StrudelIframe 
+              strudelCode={sound.strudelCode}
+              title={sound.title}
               height="500px"
-              theme="dark"
-              className="w-full"
             />
           </div>
 
@@ -240,7 +289,9 @@ function SoundDetail() {
           <DialogHeader>
             <DialogTitle>Delete Sound</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{sound.title}"? This action cannot be undone and will permanently remove your Strudel composition.
+              Are you sure you want to delete "{sound.title}"? This action
+              cannot be undone and will permanently remove your Strudel
+              composition.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

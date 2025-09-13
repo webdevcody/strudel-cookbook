@@ -178,6 +178,12 @@ export function Header({}: HeaderProps = {}) {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
+                      <Link to="/profile">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
                       <Link to="/my-songs">
                         <Music className="mr-2 h-4 w-4" />
                         <span>My Songs</span>

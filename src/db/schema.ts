@@ -170,6 +170,19 @@ export const soundTag = pgTable("sound_tag", {
     .notNull(),
 });
 
+export const soundHeart = pgTable("sound_heart", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  soundId: text("sound_id")
+    .notNull()
+    .references(() => sound.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
 export const songRelations = relations(song, ({ one, many }) => ({
   user: one(user, {
     fields: [song.userId],
@@ -196,6 +209,7 @@ export const soundRelations = relations(sound, ({ one, many }) => ({
   }),
   comments: many(soundComment),
   soundTags: many(soundTag),
+  soundHearts: many(soundHeart),
 }));
 
 export const soundCommentRelations = relations(soundComment, ({ one }) => ({
@@ -224,11 +238,23 @@ export const soundTagRelations = relations(soundTag, ({ one }) => ({
   }),
 }));
 
+export const soundHeartRelations = relations(soundHeart, ({ one }) => ({
+  user: one(user, {
+    fields: [soundHeart.userId],
+    references: [user.id],
+  }),
+  sound: one(sound, {
+    fields: [soundHeart.soundId],
+    references: [sound.id],
+  }),
+}));
+
 export const userRelations = relations(user, ({ many }) => ({
   songs: many(song),
   hearts: many(heart),
   sounds: many(sound),
   soundComments: many(soundComment),
+  soundHearts: many(soundHeart),
 }));
 
 export type Song = typeof song.$inferSelect;
@@ -256,6 +282,9 @@ export type CreateTagData = typeof tag.$inferInsert;
 
 export type SoundTag = typeof soundTag.$inferSelect;
 export type CreateSoundTagData = typeof soundTag.$inferInsert;
+
+export type SoundHeart = typeof soundHeart.$inferSelect;
+export type CreateSoundHeartData = typeof soundHeart.$inferInsert;
 
 export type SubscriptionPlan = "free" | "basic" | "pro";
 export type SubscriptionStatus =

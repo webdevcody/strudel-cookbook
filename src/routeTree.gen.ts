@@ -16,6 +16,7 @@ import { Route as UnauthenticatedRouteImport } from './routes/unauthenticated'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MySoundsRouteImport } from './routes/my-sounds'
 import { Route as MySongsRouteImport } from './routes/my-songs'
 import { Route as BrowseRouteImport } from './routes/browse'
@@ -53,6 +54,11 @@ const SignInRoute = SignInRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MySoundsRoute = MySoundsRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
+  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
+  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
+  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
@@ -167,6 +176,7 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
+    | '/profile'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
@@ -183,6 +193,7 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
+    | '/profile'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
@@ -199,6 +210,7 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
+    | '/profile'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
@@ -216,6 +228,7 @@ export interface RootRouteChildren {
   BrowseRoute: typeof BrowseRoute
   MySongsRoute: typeof MySongsRoute
   MySoundsRoute: typeof MySoundsRoute
+  ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
@@ -288,6 +301,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-sounds': {
@@ -379,6 +399,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseRoute: BrowseRoute,
   MySongsRoute: MySongsRoute,
   MySoundsRoute: MySoundsRoute,
+  ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,

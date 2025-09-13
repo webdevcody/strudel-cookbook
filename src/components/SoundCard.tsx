@@ -3,6 +3,7 @@ import { Music as MusicIcon, ExternalLink, Eye, Copy } from "lucide-react";
 import { formatRelativeTime } from "~/utils/song";
 import { Link } from "@tanstack/react-router";
 import { openInStrudel } from "~/utils/strudel";
+import { StrudelIframe } from "~/components/StrudelIframe";
 import { toast } from "sonner";
 
 interface SoundCardProps {
@@ -53,15 +54,16 @@ export function SoundCard({ sound }: SoundCardProps) {
           </div>
         </div>
 
-        <div className="bg-muted/50 rounded-md p-3 relative group/code flex-1 flex flex-col min-h-0">
-          <div className="overflow-auto flex-1 pr-8">
-            <pre className="text-xs font-mono text-muted-foreground leading-relaxed whitespace-pre-wrap">
-              {sound.strudelCode}
-            </pre>
-          </div>
+        <div className="relative flex-1 flex flex-col min-h-0 rounded-md overflow-hidden">
+          <StrudelIframe 
+            strudelCode={sound.strudelCode}
+            title={sound.title}
+            className="w-full flex-1 min-h-[180px]"
+            height="100%"
+          />
           <button
             onClick={handleCopyCode}
-            className="absolute top-2 right-2 p-1 rounded-md bg-background/80 hover:bg-background border border-border/50 hover:border-border transition-all opacity-0 group-hover/code:opacity-100"
+            className="absolute top-2 right-2 p-1 rounded-md bg-background/80 hover:bg-background border border-border/50 hover:border-border transition-all opacity-0 group-hover:opacity-100 z-10"
             aria-label="Copy code to clipboard"
           >
             <Copy className="h-3 w-3 text-muted-foreground" />
@@ -93,7 +95,7 @@ export function SoundCard({ sound }: SoundCardProps) {
           className="w-full bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2"
         >
           <ExternalLink className="h-4 w-4" />
-          Play in Strudel
+          Open in New Tab
         </button>
       </div>
     </Link>
