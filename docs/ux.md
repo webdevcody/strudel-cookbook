@@ -1,6 +1,6 @@
 # UX Patterns & Guidelines
 
-This document outlines the consistent UX patterns used throughout the SoundStation application. Follow these guidelines when adding new features or pages.
+This document outlines the consistent UX patterns used throughout the StrudelCookbook application. Follow these guidelines when adding new features or pages.
 
 ## Table of Contents
 

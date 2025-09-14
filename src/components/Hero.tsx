@@ -10,7 +10,7 @@ export function Hero() {
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
               Share Your Sound with{" "}
-              <span className="text-primary">SoundStation</span>
+              <span className="text-primary">StrudelCookbook</span>
             </h1>
             <p className="text-lg text-muted-foreground sm:text-xl max-w-2xl">
               Upload, discover, and share music with our modern audio platform.

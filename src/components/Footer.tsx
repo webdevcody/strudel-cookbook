@@ -127,10 +127,10 @@ export function Footer() {
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="flex items-center space-x-2">
               <Music className="h-6 w-6" />
-              <span className="font-semibold">SoundStation</span>
+              <span className="font-semibold">StrudelCookbook</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2025 SoundStation. All rights reserved.
+              © 2025 StrudelCookbook. All rights reserved.
             </p>
           </div>
         </div>

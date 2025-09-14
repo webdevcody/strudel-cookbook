@@ -57,7 +57,7 @@ function RouteComponent() {
   const testimonials = [
     {
       quote:
-        "SoundStation has become my go-to platform for sharing programming tutorials. The community engagement is incredible and the analytics help me create better content.",
+        "StrudelCookbook has become my go-to platform for sharing programming tutorials. The community engagement is incredible and the analytics help me create better content.",
       author: "Sofia Davis",
       role: "YouTube Tech Educator",
       initials: "SD",
@@ -128,7 +128,7 @@ function RouteComponent() {
     <div className="container mx-auto relative min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <aside
         className="relative hidden h-full flex-col bg-gradient-to-br from-slate-50 to-red-50 dark:from-slate-900 dark:to-slate-800 p-12 text-slate-800 dark:text-white lg:flex border-r border-border overflow-hidden"
-        aria-label="SoundStation branding and platform information"
+        aria-label="StrudelCookbook branding and platform information"
         role="complementary"
       >
         <div className="absolute inset-0 bg-gradient-to-br from-red-600/8 via-orange-600/6 to-red-600/4 dark:from-red-600/6 dark:to-orange-600/4" />
@@ -143,7 +143,7 @@ function RouteComponent() {
             <LogIn className="h-6 w-6 text-red-600 dark:text-red-200" />
           </div>
           <h1 className="bg-gradient-to-r from-slate-800 via-red-700 to-orange-700 dark:from-white dark:via-red-50 dark:to-orange-50 bg-clip-text text-transparent font-bold">
-            SoundStation
+            StrudelCookbook
           </h1>
         </header>
 

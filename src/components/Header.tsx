@@ -52,7 +52,7 @@ export function Header({}: HeaderProps = {}) {
           <Link to="/" className="mr-6 flex items-center space-x-2">
             <AudioWaveform />{" "}
             <span className="hidden font-bold sm:inline-block">
-              SoundStation
+              StrudelCookbook
             </span>
           </Link>
 
@@ -97,7 +97,7 @@ export function Header({}: HeaderProps = {}) {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 <AudioWaveform className="h-6 w-6" />
-                <span className="font-bold">SoundStation</span>
+                <span className="font-bold">StrudelCookbook</span>
               </Link>
               <nav className="flex flex-col gap-3 mt-6">
                 {navigationLinks.map((link) => (

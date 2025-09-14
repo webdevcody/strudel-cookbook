@@ -25,10 +25,14 @@ export const Route = createFileRoute("/profiles/$userId")({
 function UserProfile() {
   const { userId } = Route.useParams();
   const { data: session } = authClient.useSession();
-  const { data: user, isLoading: userLoading } = useQuery(getUserProfileQuery(userId));
-  const { data: sounds, isLoading: soundsLoading } = useQuery(getUserSoundsByIdQuery(userId));
+  const { data: user, isLoading: userLoading } = useQuery(
+    getUserProfileQuery(userId)
+  );
+  const { data: sounds, isLoading: soundsLoading } = useQuery(
+    getUserSoundsByIdQuery(userId)
+  );
   const { avatarUrl } = useAvatarUrl(user?.image);
-  
+
   const isOwnProfile = session?.user?.id === userId;
 
   const formatDate = (date: Date | string) => {
@@ -40,9 +44,7 @@ function UserProfile() {
     });
   };
 
-  const memberSince = user?.createdAt 
-    ? formatDate(user.createdAt)
-    : "Unknown";
+  const memberSince = user?.createdAt ? formatDate(user.createdAt) : "Unknown";
 
   if (userLoading) {
     return (
@@ -85,11 +87,13 @@ function UserProfile() {
   return (
     <Page>
       <div className="space-y-8">
-        <AppBreadcrumb items={[
-          { label: "Profiles", href: "/", icon: User },
-          { label: user.name || "User Profile" }
-        ]} />
-        
+        <AppBreadcrumb
+          items={[
+            { label: "Profiles", href: "/", icon: User },
+            { label: user.name || "User Profile" },
+          ]}
+        />
+
         <PageTitle
           title={`${user.name || "User"}'s Profile`}
           description="User profile and sound collection"
@@ -106,7 +110,7 @@ function UserProfile() {
                   className="h-24 w-24"
                   fallbackClassName="text-2xl"
                 />
-                
+
                 <div className="space-y-2">
                   <h2 className="text-xl font-semibold">
                     {user.name || "Anonymous User"}
@@ -114,7 +118,12 @@ function UserProfile() {
                 </div>
 
                 {isOwnProfile && (
-                  <Button asChild variant="outline" size="sm" className="w-full">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                  >
                     <Link to="/settings" className="flex items-center gap-2">
                       <Settings className="h-4 w-4" />
                       Edit Settings
@@ -130,18 +139,19 @@ function UserProfile() {
                     Member since {memberSince}
                   </span>
                 </div>
-                
+
                 <div className="flex items-center gap-3 text-sm">
                   <Code className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">
-                    {sounds?.length || 0} sound{sounds?.length !== 1 ? 's' : ''} created
+                    {sounds?.length || 0} sound{sounds?.length !== 1 ? "s" : ""}{" "}
+                    created
                   </span>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm">
                   <AudioWaveform className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">
-                    SoundStation Creator
+                    StrudelCookbook Creator
                   </span>
                 </div>
               </div>
@@ -151,7 +161,9 @@ function UserProfile() {
           {/* Right Column - User's Sounds */}
           <div className="lg:col-span-2 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">{user.name || "User"}'s Sounds</h3>
+              <h3 className="text-lg font-semibold">
+                {user.name || "User"}'s Sounds
+              </h3>
               {sounds && sounds.length > 0 && (
                 <p className="text-sm text-muted-foreground">
                   {sounds.length} {sounds.length === 1 ? "sound" : "sounds"}
@@ -207,7 +219,7 @@ function UserProfile() {
                       </div>
 
                       <div className="relative flex-1 flex flex-col min-h-0 rounded-md overflow-hidden">
-                        <StrudelIframe 
+                        <StrudelIframe
                           strudelCode={sound.strudelCode}
                           title={sound.title}
                           className="w-full flex-1 min-h-[140px]"
