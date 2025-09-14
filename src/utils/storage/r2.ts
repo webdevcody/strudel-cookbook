@@ -9,15 +9,14 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { privateEnv } from "~/config/privateEnv";
-import { publicEnv } from "~/config/publicEnv";
 
 export class R2Storage implements IStorage {
   private readonly client: S3Client;
   private readonly bucket: string;
 
   constructor() {
-    const endpoint = publicEnv.R2_ENDPOINT;
-    const bucket = publicEnv.R2_BUCKET;
+    const endpoint = privateEnv.R2_ENDPOINT;
+    const bucket = privateEnv.R2_BUCKET;
     const accessKeyId = privateEnv.R2_ACCESS_KEY_ID;
     const secretAccessKey = privateEnv.R2_SECRET_ACCESS_KEY;
 
@@ -102,7 +101,10 @@ export class R2Storage implements IStorage {
     );
   }
 
-  async getPresignedUploadUrl(key: string, contentType: string = "application/octet-stream") {
+  async getPresignedUploadUrl(
+    key: string,
+    contentType: string = "application/octet-stream"
+  ) {
     console.log("Generating presigned URL for:", {
       key,
       contentType,
