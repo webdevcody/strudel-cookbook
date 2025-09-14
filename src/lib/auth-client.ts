@@ -1,4 +1,6 @@
 import { createAuthClient } from "better-auth/react";
+import { publicEnv } from "~/config/publicEnv";
+
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:3000",
+  baseURL: publicEnv.HOST_NAME,
 });

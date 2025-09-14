@@ -280,6 +280,11 @@ function RouteComponent() {
               variant="outline"
               type="button"
               disabled={isLoading}
+              onClick={() => {
+                authClient.signIn.social({
+                  provider: "google",
+                });
+              }}
               className="transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] border-muted-foreground/20 hover:border-muted-foreground/40"
             >
               {isLoading ? (
