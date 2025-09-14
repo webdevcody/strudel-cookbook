@@ -278,11 +278,3 @@ export type CreateSoundTagData = typeof soundTag.$inferInsert;
 
 export type SoundHeart = typeof soundHeart.$inferSelect;
 export type CreateSoundHeartData = typeof soundHeart.$inferInsert;
-
-export type SubscriptionPlan = "free" | "basic" | "pro";
-export type SubscriptionStatus =
-  | "active"
-  | "canceled"
-  | "past_due"
-  | "unpaid"
-  | "incomplete";
