@@ -13,7 +13,6 @@ This is a TanStack Start full-stack React application with the following key arc
 - **Authentication**: Better Auth with email/password authentication
 - **Styling**: Tailwind CSS with Radix UI components
 - **File Storage**: AWS S3/R2 with presigned URL uploads
-- **Payments**: Stripe integration for subscriptions
 - **TypeScript**: Full type safety throughout
 
 ### Project Structure
@@ -37,7 +36,6 @@ Core entities: `user`, `song`, `heart` (likes), with subscription and authentica
 - **Data Fetching**: Uses TanStack Query with custom hooks pattern
 - **Authentication**: Better Auth with session management
 - **File Uploads**: Presigned URLs for direct S3/R2 uploads
-- **Subscriptions**: Stripe-based with plan limits enforcement
 - **Type Safety**: Full TypeScript with Drizzle ORM schema inference
 
 ## Common Development Commands
@@ -54,9 +52,6 @@ npm run db:down            # Stop PostgreSQL Docker container
 npm run db:migrate         # Run database migrations
 npm run db:generate        # Generate new migration files
 npm run db:studio          # Open Drizzle Studio for database management
-
-# Payments (if needed)
-npm run stripe:listen      # Listen for Stripe webhooks in development
 ```
 
 ## Environment Setup
@@ -64,7 +59,6 @@ npm run stripe:listen      # Listen for Stripe webhooks in development
 1. Copy `.env.example` to `.env` and configure:
    - Database connection (PostgreSQL)
    - Better Auth secrets
-   - Stripe keys (for payments)
    - AWS S3/R2 credentials (for file storage)
 
 2. Start database and run migrations:

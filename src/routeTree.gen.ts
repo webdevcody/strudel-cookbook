@@ -26,7 +26,6 @@ import { Route as SoundsIdIndexRouteImport } from './routes/sounds/$id/index'
 import { Route as SongIdIndexRouteImport } from './routes/song/$id/index'
 import { Route as SoundsIdEditRouteImport } from './routes/sounds/$id/edit'
 import { Route as SongIdEditRouteImport } from './routes/song/$id/edit'
-import { ServerRoute as ApiStripeWebhookServerRouteImport } from './routes/api/stripe/webhook'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -105,11 +104,6 @@ const SongIdEditRoute = SongIdEditRouteImport.update({
   id: '/song/$id/edit',
   path: '/song/$id/edit',
   getParentRoute: () => rootRouteImport,
-} as any)
-const ApiStripeWebhookServerRoute = ApiStripeWebhookServerRouteImport.update({
-  id: '/api/stripe/webhook',
-  path: '/api/stripe/webhook',
-  getParentRoute: () => rootServerRouteImport,
 } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
   id: '/api/auth/$',
@@ -242,28 +236,24 @@ export interface RootRouteChildren {
 }
 export interface FileServerRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookServerRoute
 }
 export interface FileServerRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookServerRoute
 }
 export interface FileServerRoutesById {
   __root__: typeof rootServerRouteImport
   '/api/auth/$': typeof ApiAuthSplatServerRoute
-  '/api/stripe/webhook': typeof ApiStripeWebhookServerRoute
 }
 export interface FileServerRouteTypes {
   fileServerRoutesByFullPath: FileServerRoutesByFullPath
-  fullPaths: '/api/auth/$' | '/api/stripe/webhook'
+  fullPaths: '/api/auth/$'
   fileServerRoutesByTo: FileServerRoutesByTo
-  to: '/api/auth/$' | '/api/stripe/webhook'
-  id: '__root__' | '/api/auth/$' | '/api/stripe/webhook'
+  to: '/api/auth/$'
+  id: '__root__' | '/api/auth/$'
   fileServerRoutesById: FileServerRoutesById
 }
 export interface RootServerRouteChildren {
   ApiAuthSplatServerRoute: typeof ApiAuthSplatServerRoute
-  ApiStripeWebhookServerRoute: typeof ApiStripeWebhookServerRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -377,13 +367,6 @@ declare module '@tanstack/react-router' {
 }
 declare module '@tanstack/react-start/server' {
   interface ServerFileRoutesByPath {
-    '/api/stripe/webhook': {
-      id: '/api/stripe/webhook'
-      path: '/api/stripe/webhook'
-      fullPath: '/api/stripe/webhook'
-      preLoaderRoute: typeof ApiStripeWebhookServerRouteImport
-      parentRoute: typeof rootServerRouteImport
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -416,7 +399,6 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 const rootServerRouteChildren: RootServerRouteChildren = {
   ApiAuthSplatServerRoute: ApiAuthSplatServerRoute,
-  ApiStripeWebhookServerRoute: ApiStripeWebhookServerRoute,
 }
 export const serverRouteTree = rootServerRouteImport
   ._addFileChildren(rootServerRouteChildren)

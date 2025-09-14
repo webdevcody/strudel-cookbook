@@ -15,13 +15,6 @@ export const user = pgTable("user", {
     .$defaultFn(() => false)
     .notNull(),
   image: text("image"),
-  stripeCustomerId: text("stripe_customer_id"),
-  subscriptionId: text("subscription_id"),
-  plan: text("plan")
-    .$default(() => "free")
-    .notNull(),
-  subscriptionStatus: text("subscription_status"),
-  subscriptionExpiresAt: timestamp("subscription_expires_at"),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),

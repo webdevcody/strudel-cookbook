@@ -4,10 +4,7 @@ export const privateEnv = {
 
   // Better Auth
   BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET!,
-
-  // Stripe
-  STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY!,
-  STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET!,
+  BETTER_AUTH_URL: process.env.BETTER_AUTH_URL!,
 
   R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID!,
   R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY!,
@@ -20,4 +17,7 @@ export const privateEnv = {
   AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY!,
   AWS_REGION: process.env.AWS_REGION!,
   AWS_SES_FROM_EMAIL: process.env.AWS_SES_FROM_EMAIL!,
+
+  R2_ENDPOINT: process.env.R2_ENDPOINT!,
+  R2_BUCKET: process.env.R2_BUCKET!,
 } as const;
