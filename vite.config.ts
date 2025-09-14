@@ -8,6 +8,10 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
     },
-    plugins: [tsConfigPaths(), tailwindcss(), tanstackStart()],
+    plugins: [
+      tsConfigPaths(),
+      tailwindcss(),
+      tanstackStart({ target: "node-server", customViteReactPlugin: true }),
+    ],
   };
 });

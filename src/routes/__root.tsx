@@ -7,8 +7,6 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import * as React from "react";
-import { useState } from "react";
-import type { Song } from "~/db/schema";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
@@ -22,7 +20,6 @@ import { Toaster } from "~/components/ui/sonner";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { Footer } from "~/components/Footer";
-import { MusicPlayer } from "~/components/MusicPlayer";
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
@@ -87,8 +84,6 @@ function RootComponent() {
 function RootDocument({ children }: { children: React.ReactNode }) {
   const routerState = useRouterState();
   const prevPathnameRef = React.useRef("");
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  const [isMusicPlayerVisible, setIsMusicPlayerVisible] = useState(false);
 
   React.useEffect(() => {
     const currentPathname = routerState.location.pathname;
@@ -170,11 +165,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             <main>{children}</main>
             <Footer />
           </div>
-          <MusicPlayer
-            song={currentSong}
-            isVisible={isMusicPlayerVisible}
-            onClose={() => setIsMusicPlayerVisible(false)}
-          />
           <TanStackRouterDevtools position="bottom-right" />
           <ReactQueryDevtools buttonPosition="bottom-left" />
           <Toaster />
