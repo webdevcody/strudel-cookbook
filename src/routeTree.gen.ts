@@ -13,9 +13,11 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UploadRouteImport } from './routes/upload'
 import { Route as UnauthenticatedRouteImport } from './routes/unauthenticated'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as MySoundsRouteImport } from './routes/my-sounds'
 import { Route as MySongsRouteImport } from './routes/my-songs'
 import { Route as BrowseRouteImport } from './routes/browse'
@@ -40,6 +42,11 @@ const UnauthenticatedRoute = UnauthenticatedRouteImport.update({
   path: '/unauthenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignUpRoute = SignUpRouteImport.update({
   id: '/sign-up',
   path: '/sign-up',
@@ -53,6 +60,11 @@ const SignInRoute = SignInRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MySoundsRoute = MySoundsRouteImport.update({
@@ -116,9 +128,11 @@ export interface FileRoutesByFullPath {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
+  '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/terms': typeof TermsRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
   '/profiles/$userId': typeof ProfilesUserIdRoute
@@ -133,9 +147,11 @@ export interface FileRoutesByTo {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
+  '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/terms': typeof TermsRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
   '/profiles/$userId': typeof ProfilesUserIdRoute
@@ -151,9 +167,11 @@ export interface FileRoutesById {
   '/browse': typeof BrowseRoute
   '/my-songs': typeof MySongsRoute
   '/my-sounds': typeof MySoundsRoute
+  '/privacy': typeof PrivacyRoute
   '/settings': typeof SettingsRoute
   '/sign-in': typeof SignInRoute
   '/sign-up': typeof SignUpRoute
+  '/terms': typeof TermsRoute
   '/unauthenticated': typeof UnauthenticatedRoute
   '/upload': typeof UploadRoute
   '/profiles/$userId': typeof ProfilesUserIdRoute
@@ -170,9 +188,11 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
+    | '/privacy'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
+    | '/terms'
     | '/unauthenticated'
     | '/upload'
     | '/profiles/$userId'
@@ -187,9 +207,11 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
+    | '/privacy'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
+    | '/terms'
     | '/unauthenticated'
     | '/upload'
     | '/profiles/$userId'
@@ -204,9 +226,11 @@ export interface FileRouteTypes {
     | '/browse'
     | '/my-songs'
     | '/my-sounds'
+    | '/privacy'
     | '/settings'
     | '/sign-in'
     | '/sign-up'
+    | '/terms'
     | '/unauthenticated'
     | '/upload'
     | '/profiles/$userId'
@@ -222,9 +246,11 @@ export interface RootRouteChildren {
   BrowseRoute: typeof BrowseRoute
   MySongsRoute: typeof MySongsRoute
   MySoundsRoute: typeof MySoundsRoute
+  PrivacyRoute: typeof PrivacyRoute
   SettingsRoute: typeof SettingsRoute
   SignInRoute: typeof SignInRoute
   SignUpRoute: typeof SignUpRoute
+  TermsRoute: typeof TermsRoute
   UnauthenticatedRoute: typeof UnauthenticatedRoute
   UploadRoute: typeof UploadRoute
   ProfilesUserIdRoute: typeof ProfilesUserIdRoute
@@ -272,6 +298,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnauthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sign-up': {
       id: '/sign-up'
       path: '/sign-up'
@@ -291,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-sounds': {
@@ -382,9 +422,11 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseRoute: BrowseRoute,
   MySongsRoute: MySongsRoute,
   MySoundsRoute: MySoundsRoute,
+  PrivacyRoute: PrivacyRoute,
   SettingsRoute: SettingsRoute,
   SignInRoute: SignInRoute,
   SignUpRoute: SignUpRoute,
+  TermsRoute: TermsRoute,
   UnauthenticatedRoute: UnauthenticatedRoute,
   UploadRoute: UploadRoute,
   ProfilesUserIdRoute: ProfilesUserIdRoute,
