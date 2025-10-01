@@ -147,13 +147,6 @@ function UserProfile() {
                     created
                   </span>
                 </div>
-
-                <div className="flex items-center gap-3 text-sm">
-                  <AudioWaveform className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">
-                    StrudelCookbook Creator
-                  </span>
-                </div>
               </div>
             </div>
           </div>

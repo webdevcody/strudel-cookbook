@@ -1,6 +1,7 @@
 @import "tailwindcss" source("../");
 
 @custom-variant dark (&:is(.dark *));
+
 :root {
   --background: oklch(0.9730 0.0133 286.1503);
   --foreground: oklch(0.3015 0.0572 282.4176);

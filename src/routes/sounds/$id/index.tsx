@@ -250,8 +250,6 @@ function SoundDetail() {
                 <Calendar className="h-4 w-4" />
                 Created {formatDate(sound.createdAt)}
               </span>
-              <span>•</span>
-              <span>{sound.strudelCode.length} characters</span>
             </div>
 
             {/* Tags near title */}
@@ -296,7 +294,7 @@ function SoundDetail() {
               </div>
             </div>
 
-            <StrudelIframe 
+            <StrudelIframe
               strudelCode={sound.strudelCode}
               title={sound.title}
               height="500px"

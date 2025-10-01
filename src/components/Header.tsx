@@ -11,6 +11,7 @@ import {
   Music,
   Upload,
   Code,
+  Github,
 } from "lucide-react";
 import { UserAvatar } from "./UserAvatar";
 import { useUserAvatar } from "~/hooks/useUserAvatar";
@@ -215,6 +216,15 @@ export function Header({}: HeaderProps = {}) {
                 </Link>
               </>
             )}
+            <a
+              href="https://github.com/webdevcody/the-strudel-cookbook"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground/60 hover:text-foreground/80 transition-colors"
+            >
+              <Github className="h-5 w-5" />
+              <span className="sr-only">GitHub</span>
+            </a>
             <ModeToggle />
           </nav>
         </div>
